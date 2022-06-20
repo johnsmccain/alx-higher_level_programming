@@ -1,14 +1,17 @@
 #!/usr/bin/python3
+
+
 def safe_print_list(my_list=[], x=0):
-    index = 0
-    while True:
+    """
+    prints a list of anything, but only prints the integers
+    Returns the amount of integers printed
+    """
+    printed = 0
+    for i in range(x):
         try:
-            if index < x:
-                print(my_list[index], end='')
-                index += 1
-            else:
-                print()
-                return index
-        except IndexError:
-            print()
-            return index
+            print("{:d}".format(my_list[i]), end="")
+            printed += 1
+        except:
+            continue
+    print()
+    return printed
