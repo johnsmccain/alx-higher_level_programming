@@ -1,25 +1,32 @@
 #!/usr/bin/python3
-"""Start link class to table in database
 """
-import sys
+Created on Sat Aug  8 09:05:11 2020
+
+@author: Robinson Montes
+"""
 from model_state import Base, State
 from model_city import City
-from sqlalchemy import (create_engine)
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import relationship
+from sqlalchemy import (create_engine)
+import sys
 
-if __name__ == "__main__":
-    user_name = sys.argv[1]
-    password = sys.argv[2]
-    db_name = sys.argv[3]
-    State.cities = relationship("City",
-                                order_by=City.id, back_populates="state")
-    connection = 'mysql+mysqldb://{}:{}@localhost:3306/{}'
-    eng = create_engine(connection.format(user_name, password, db_name),
-                        pool_pre_ping=True)
-    Session = sessionmaker(bind=eng)
+
+if __name__ == '__main__':
+    args = sys.argv
+    if len(args) != 4:
+        print("Usage: {} username password database_name".format(args[0]))
+        exit(1)
+    username = args[1]
+    password = args[2]
+    data = args[3]
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'
+                           .format(username, password, data))
+    # create custom session object class from database engine
+    Session = sessionmaker(bind=engine)
+    # create instance of new custom session class
     session = Session()
-    query = session.query(State, City).\
-        filter(City.state_id == State.id).all()
-    for row in query:
-        print("{}: ({}) {}".format(row[0].name, row[1].id, row[1].name))
+    results = session.query(State.name, City.id, City.name)\
+                     .join(City, City.state_id == State.id)\
+                     .order_by(City.id)
+    for result in results:
+        print("{}: ({}) {}".format(result[0], result[1], result[2]))

@@ -1,21 +1,30 @@
 #!/usr/bin/python3
 """
-lists all cities from the database hbtn_0e_4_usa
+Created on Sat Aug  8 09:05:11 2020
+
+@author: Robinson Montes
 """
-if __name__ == "__main__":
+import MySQLdb
+import sys
 
-    import MySQLdb
-    from sys import argv
 
-    conect = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
-                             passwd=argv[2], db=argv[3], charset="utf8")
-    cursor = conect.cursor()
-    cursor.execute("""SELECT cities.id, cities.name, states.name
-    FROM cities
-    LEFT JOIN states ON cities.state_id = states.id
-    ORDER BY cities.id ASC""")
-    query_rows = cursor.fetchall()
-    for row in query_rows:
+if __name__ == '__main__':
+    args = sys.argv
+    if len(args) != 4:
+        print("Usage: {} username password database_name".format(args[0]))
+        exit(1)
+    username = args[1]
+    password = args[2]
+    data = args[3]
+    db = MySQLdb.connect(host='localhost', user=username,
+                         passwd=password, db=data, port=3306)
+    cur = db.cursor()
+    num_rows = cur.execute("SELECT cities.id, cities.name, states.name\
+                           FROM cities INNER JOIN states\
+                           ON cities.state_id=states.id\
+                           ORDER BY cities.id;")
+    rows = cur.fetchall()
+    for row in rows:
         print(row)
-    cursor.close()
-    conect.close()
+    cur.close()
+    db.close()

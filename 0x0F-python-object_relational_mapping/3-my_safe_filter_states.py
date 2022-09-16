@@ -1,21 +1,29 @@
 #!/usr/bin/python3
+"""
+Created on Sat Aug  8 09:05:11 2020
 
-
+@author: Robinson Montes
+"""
 import MySQLdb
-from sys import argv
+import sys
 
-'''
-script that lists all states from the database
-'''
-if __name__ == "__main__":
-    cont = MySQLdb.connect(
-        host="localhost", port=3306, user=argv[1],
-        password=argv[2], database=argv[3])
-    cursor = cont.cursor()
-    cursor.execute(
-        "SELECT * FROM states WHERE name LIKE %s ORDER BY id ASC",
-        (argv[4],)
-        )
-    db = cursor.fetchall()
-    for i in db:
-        print(i)
+
+if __name__ == '__main__':
+    args = sys.argv
+    if len(args) < 5:
+        print("Usage: {} username password database_name".format(args[0]))
+        exit(1)
+    username = args[1]
+    password = args[2]
+    data = args[3]
+    state_name = args[4]
+    db = MySQLdb.connect(host='localhost', user=username,
+                         passwd=password, db=data, port=3306)
+    cur = db.cursor()
+    num_rows = cur.execute("SELECT * FROM states WHERE states.name LIKE BINARY\
+                           %s ORDER BY states.id;", (state_name,))
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
+    cur.close()
+    db.close()

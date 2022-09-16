@@ -1,27 +1,35 @@
 #!/usr/bin/python3
 """
-lists all cities from the database
+Created on Sat Aug  8 09:05:11 2020
+
+@author: Robinson Montes
 """
-if __name__ == "__main__":
+import MySQLdb
+import sys
 
-    import MySQLdb
-    from sys import argv
 
-    cont = 0
-    conect = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
-                             passwd=argv[2], db=argv[3], charset="utf8")
-    cursor = conect.cursor()
-    cursor.execute("""SELECT cities.id, cities.name, states.name
-    FROM cities
-    LEFT JOIN states ON cities.state_id = states.id
-    ORDER BY cities.id ASC""")
-    query_rows = cursor.fetchall()
-    for row in query_rows:
-        if row[2] == argv[4]:
-            if cont > 0:
-                print(", ", end="")
-            print(row[1], end="")
-            cont = cont + 1
+if __name__ == '__main__':
+    args = sys.argv
+    if len(args) != 5:
+        print("Usage: {} username password database_name".format(args[0]))
+        exit(1)
+    username = args[1]
+    password = args[2]
+    data = args[3]
+    state_name = args[4]
+    db = MySQLdb.connect(host='localhost', user=username,
+                         passwd=password, db=data, port=3306)
+    cur = db.cursor()
+    num_rows = cur.execute("SELECT cities.name FROM cities WHERE state_id =\
+                           (SELECT id FROM states WHERE name LIKE BINARY %s)\
+                           ORDER BY cities.id;", (state_name, ))
+    rows = cur.fetchall()
+    i = 1
+    for row in rows:
+        print(row[0], end='')
+        if i < num_rows:
+            print(end=', ')
+        i += 1
     print()
-    cursor.close()
-    conect.close()
+    cur.close()
+    db.close()
