@@ -6,7 +6,7 @@ const request = require('request');
 const [_, _1, url, file] = process.argv;
 
 request(url, (err, res, body) => {
-	fs.writeFile(file, body, 'utf-8', (err) => {
-		if (err) console.log(err);
-	});
+  fs.writeFile(file, body, 'utf-8', (err) => {
+    if (err) console.log(err);
+  });
 });
