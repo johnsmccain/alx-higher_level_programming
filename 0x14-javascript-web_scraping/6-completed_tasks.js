@@ -6,19 +6,20 @@ const url = process.argv[2];
 let id = 0;
 const data = {};
 request(url, (err, res, body) => {
+  if (err) return console.log(err);
   JSON.parse(body).forEach(el => {
-    		if (el.completed === true) {
-      			key = String(el.userId);
-      			if (el.userId === id) {
+    if (el.completed === true) {
+      const key = String(el.userId);
+      if (el.userId === id) {
         data[key]++;
-      			}
-      			if (el.userId !== id) {
+      }
+      if (el.userId !== id) {
         data[key] = 1;
-      			}
-      			id = el.userId;
-    		}
-  	}
-  	);
-  	console.log(data);
+      }
+      id = el.userId;
+    }
+  }
+  );
+  console.log(data);
 }
 );
